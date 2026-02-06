@@ -20,9 +20,13 @@
 #include <ESP8266WiFi.h>
 #include <painlessMesh.h>
 
+
+
 #define MESH_PREFIX "MyMeshNet"
 #define MESH_PASSWORD "myPassword"
 #define MESH_PORT 5555
+
+
 
 class MeshNode {
 public:
@@ -99,10 +103,13 @@ private:
     painlessMesh mesh; ///< painlessMesh实例，用于处理实际的网络通信
     unsigned long lastConnectionCheck; ///< 上次检查连接的时间戳
     const int CHECK_INTERVAL = 5000; ///< 连接检查间隔（毫秒），每5秒检查一次
-    
+
+
+    uint8_t slave_addr; ///< 从机地址
+    uint8_t slave_cmd; ///< 从机状态
+
     // Static instance pointer for callbacks
     static MeshNode* instance; ///< 静态实例指针，用于在静态回调函数中访问类成员
-    
     // Callback functions
     /**
      * @brief 收到消息时的回调函数

@@ -10,6 +10,7 @@ MeshNode* MeshNode::instance = nullptr;
 MeshNode::MeshNode() {
     lastConnectionCheck = 0;
     instance = this;  // Store the instance pointer
+    
 }
 
 /**
@@ -29,7 +30,6 @@ MeshNode::~MeshNode() {
 void MeshNode::begin() {
     // 设置 Mesh
     mesh.init(MESH_PREFIX, MESH_PASSWORD, MESH_PORT);
-    
     mesh.onReceive(&MeshNode::receivedCallback);
     mesh.onNewConnection(&MeshNode::newConnectionCallback);
     mesh.onChangedConnections(&MeshNode::changedConnectionCallback);
@@ -39,6 +39,8 @@ void MeshNode::begin() {
     // mesh.initOTAReceive("ota");  // 初始化OTA，便于无线更新
     // Serial.println("Mesh 初始化完成，等待连接...");
 }
+
+ 
 
 /**
  * @brief 更新Mesh网络状态实现
@@ -102,25 +104,25 @@ void MeshNode::printNetworkStatus() {
     Serial.println(")");
 }
 
+
+
 // ========== 回调函数 ==========
 /**
  * @brief 收到消息时的回调函数实现
  * @param from 发送消息的节点ID
  * @param msg 收到的消息内容
  * 处理收到的消息，如果是心跳消息则发送确认回复
+ *7B 7B 09 10 03 01 00 00 00 00 0F 7D 7D
+ *                 addr   cmd
  */
 void MeshNode::receivedCallback(uint32_t from, String &msg) {
-    // if(instance != nullptr) {
-    //     Serial.printf("[%lu] 来自 %u: %s\n", millis()/1000, from, msg.c_str());
-        
-    //     // 如果是心跳消息，回复确认
-    //     if (msg.startsWith("HEARTBEAT_")) {
-    //         String reply = "ACK_" + String(instance->mesh.getNodeId()) + "_to_" + String(from);
-    //         instance->mesh.sendSingle(from, reply);
-    //     }
-    // }
+    // 1. 先做长度校验，避免字节数不足8个时访问越界（必须加，防止程序崩溃）
+    if (msg.length() < 13) {
+        return;
+    }
+    // instance->slave_addr = static_cast<uint8_t>(msg.charAt(6));//addr
+    // instance->slave_cmd = static_cast<uint8_t>(msg.charAt(8));//cmd
 
-    
 }
 
 /**

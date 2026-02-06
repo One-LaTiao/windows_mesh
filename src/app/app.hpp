@@ -33,14 +33,15 @@ public:
     // 初始化函数
     void begin();
     void modbus_exec();
-    void request_dev();
-    // 执行函数 - 包含所有主要逻辑
     void exec();
 
 private:
     uint16_t time_count;
     uint16_t blinkInterval;
     uint32_t last_led_time;
+    uint8_t slave_addr;//从机地址
+    uint8_t slave_sta;//从机状态
+    uint8_t slave_cmd;//从机命令
     LEDDriver led;
     UART uart;
     MODBUS modbus;

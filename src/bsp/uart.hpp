@@ -42,25 +42,6 @@ public:
     bool begin(uint32_t baudRate);
 
     /**
-     * @brief 关闭串口
-     */
-    void end();
-
-    /**
-     * @brief 检查串口是否已初始化
-     * @return 已初始化返回true，否则返回false
-     */
-    bool isInitialized() const;
-
-    /**
-     * @brief 读取可用的串口数据
-     * @param buffer 存储数据的缓冲区
-     * @param maxLen 缓冲区最大长度
-     * @return 读取到的数据长度
-     */
-    size_t readData(uint8_t* buffer, size_t maxLen);
-
-    /**
      * @brief CRC16 Modbus校验
      * @param puchMsg 数据地址
      * @param usDataLen 数据长度

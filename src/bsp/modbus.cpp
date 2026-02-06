@@ -12,13 +12,6 @@ MODBUS::MODBUS()
     serial_sta = G_SERIAL_STOP;
 }
 
-/**
- * @brief 队列清空方法实现：映射SimpleQueue::reset
- */
-void MODBUS::clearQueue()
-{
-    modbusQueue.reset();  // SimpleQueue的清空接口为reset，替代原clear/empty
-}
 
 /**
  * @brief 初始化Modbus实现 完全保留，仅调用类内clearQueue
@@ -26,7 +19,7 @@ void MODBUS::clearQueue()
 void MODBUS::begin()
 {
     MODBUS_SERIAL.begin(SERIAL_BAUD, SERIAL_8N1);  // 原有代码，不动
-    this->clearQueue();  // 初始化队列，逻辑不变
+    modbusQueue.reset();  // 初始化队列，逻辑不变
 }
 
 /**
@@ -43,7 +36,7 @@ void MODBUS::serialEvent_callback()
 /**
  * @brief 解析Modbus RTU帧实现：仅替换队列操作，Modbus核心逻辑完全不变
  */
-void MODBUS::parseModbusFrame()
+uint16_t MODBUS::parseModbusFrame()
 {
 #define UART_CMD_HEAD 0x7b
 #define UART_CMD_TAIL 0x7d
@@ -65,16 +58,18 @@ void MODBUS::parseModbusFrame()
 					uart_pos = 0;
                     this->serial_addr = modbusFrameBuf[6];//获取从机地址
                     this->serial_sta = modbusFrameBuf[7];//获取从机状态
+                    return (uint16_t)this->serial_addr << 8 | (uint16_t)this->serial_sta;
                     /* 校验通过，处理数据 */
 				}else{uart_pos = 0;}
 			}
 		}
     }
+    return 0;
 }
 /**
  * @brief 设置从机状态实现：新增校验逻辑，原有逻辑不变
  */
-void MODBUS::set_serial(uint8_t addr, uint8_t cmd)
+void MODBUS::set_slave(uint8_t addr, uint8_t cmd)
 {
     uint8_t tx_data[16] = {0};
     tx_data[0] = 0x7b;
@@ -84,8 +79,8 @@ void MODBUS::set_serial(uint8_t addr, uint8_t cmd)
     tx_data[4] = 0x03;
     tx_data[5] = 0x01;
     tx_data[6] = addr;
-    tx_data[7] = cmd;
-    tx_data[8] = 0x00;
+    tx_data[7] = 0x00;
+    tx_data[8] = cmd;
     tx_data[9] = 0x00;
     tx_data[10] = calculateXOR(tx_data);
     tx_data[11] = 0x7d;
@@ -102,4 +97,5 @@ uint8_t MODBUS::calculateXOR(const uint8_t *data)
     }
     return xorValue;
 }
+
 

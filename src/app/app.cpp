@@ -1,6 +1,5 @@
 #include "app.hpp"
 
-
 /**
  * @brief APP类的构造函数
  * @details 初始化APP类的实例，并设置LED引脚
@@ -35,9 +34,13 @@ void APP::begin()
     // 例如：初始化串口、设置引脚模式等
     this->led.init();//初始化LED
     // this->uart.begin(115200);//初始化串口
+
     this->mesh.begin();//mesh节点初始化
     this->modbus.begin();//modbus初始化
 }
+
+
+
 /**
  * @brief modbus执行函数
  * @details 用于解析modbus帧
@@ -47,8 +50,6 @@ void APP::modbus_exec()
 {
     this->modbus.serialEvent_callback();//解析modbus帧
 }
-
-
 
 /**
  * @brief 执行函数
@@ -62,7 +63,6 @@ void APP::exec()
 {
     this->mesh.update();//执行mesh节点
     // 检查mesh连接状态
-
     if(this->mesh.getNodeList().size() > 0){
         // 有连接：1秒一闪（慢闪）
         blinkInterval = 1000; // 1000ms = 1秒
@@ -76,7 +76,10 @@ void APP::exec()
         this->led.toggle();
         this->last_led_time = sys_cnt;//更新LED时间戳
     }
-    this->modbus.parseModbusFrame();//解析modbus帧
-
+    uint16_t slave_data = this->modbus.parseModbusFrame();//解析modbus帧
+    if(slave_data != 0){//如果从机数据不为0
+        this->slave_addr = slave_data >> 8;//获取从机地址
+        this->slave_sta = slave_data & 0xFF;//获取从机状态
+    }
 }
 
