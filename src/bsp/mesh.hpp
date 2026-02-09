@@ -99,6 +99,10 @@ public:
      */
     int8_t getRSSI();
 
+    uint8_t getSlaveSTA();///< 获取从机状态
+    void set_SlaveSTA(uint8_t sta);///< 设置从机状态
+    uint16_t getSlavedata();///< 获取从机命令
+
 private:
     painlessMesh mesh; ///< painlessMesh实例，用于处理实际的网络通信
     unsigned long lastConnectionCheck; ///< 上次检查连接的时间戳
@@ -107,6 +111,7 @@ private:
 
     uint8_t slave_addr; ///< 从机地址
     uint8_t slave_cmd; ///< 从机状态
+    uint8_t slave_sta; ///< 从机状态1为收到消息。0为未收到消息
 
     // Static instance pointer for callbacks
     static MeshNode* instance; ///< 静态实例指针，用于在静态回调函数中访问类成员

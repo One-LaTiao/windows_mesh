@@ -103,6 +103,30 @@ void MeshNode::printNetworkStatus() {
     else Serial.print("差");
     Serial.println(")");
 }
+/**
+ * @brief 获取从机状态实现
+ * @return 返回从机状态
+ */
+uint8_t MeshNode::getSlaveSTA()
+{
+    return slave_sta;
+}
+/**
+ * @brief 设置从机状态实现
+ * @param sta 要设置的从机状态
+ */
+void MeshNode::set_SlaveSTA(uint8_t sta)
+{
+    slave_sta = sta;
+}
+/**
+ * @brief 获取从机命令实现
+ * @return 返回从机命令
+ */
+uint16_t MeshNode::getSlavedata()
+{
+    return this->slave_addr << 8 | this->slave_cmd;
+}
 
 
 
@@ -120,9 +144,9 @@ void MeshNode::receivedCallback(uint32_t from, String &msg) {
     if (msg.length() < 13) {
         return;
     }
-    // instance->slave_addr = static_cast<uint8_t>(msg.charAt(6));//addr
-    // instance->slave_cmd = static_cast<uint8_t>(msg.charAt(8));//cmd
-
+    instance->slave_addr = static_cast<uint8_t>(msg.charAt(6));//addr
+    instance->slave_cmd = static_cast<uint8_t>(msg.charAt(8));//cmd
+    instance->slave_sta = 1;//收到消息
 }
 
 /**

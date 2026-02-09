@@ -39,6 +39,20 @@ void APP::begin()
     this->modbus.begin();//modbus初始化
 }
 
+void APP::received_handle()
+{
+    if(this->mesh.getSlaveSTA() == 1){//如果从机状态为1
+        this->mesh.set_SlaveSTA(0);//设置从机状态为0
+        uint16_t slave_data = this->mesh.getSlavedata();//获取从机命令
+        if(slave_data == this->slave_addr){//如果从机数据不为0
+            this->modbus.set_slave(this->slave_addr,slave_data & 0xFF);//设置从机地址
+        }
+    }else
+    {
+        this->modbus.set_slave(this->slave_addr,0x03);//设置从机地址
+    }
+}
+
 
 
 /**
@@ -70,12 +84,21 @@ void APP::exec()
         // 无连接：200ms一闪（快闪）
         blinkInterval = 100; // 100ms
     }
+
     uint32_t sys_cnt = millis();
     // // 使用time_count进行时间计数，每1ms增加一次
-    if(sys_cnt - this->last_led_time > blinkInterval){
+    if((sys_cnt - this->last_led_time) > blinkInterval){
         this->led.toggle();
         this->last_led_time = sys_cnt;//更新LED时间戳
     }
+
+    // 检查mesh连接状态
+    if((sys_cnt - this->last_mesh_time) > 10){//如果1秒没有收到mesh数据
+        this->received_handle();//处理mesh接收数据
+        this->last_mesh_time = sys_cnt;//更新mesh时间戳
+    }
+
+
     uint16_t slave_data = this->modbus.parseModbusFrame();//解析modbus帧
     if(slave_data != 0){//如果从机数据不为0
         this->slave_addr = slave_data >> 8;//获取从机地址
