@@ -35,21 +35,20 @@ void APP::begin()
     this->led.init();//初始化LED
     // this->uart.begin(115200);//初始化串口
 
-    this->mesh.begin();//mesh节点初始化
+    this->mymesh.begin();//mymesh节点初始化
     this->modbus.begin();//modbus初始化
 }
 
 void APP::received_handle()
 {
-    if(this->mesh.getSlaveSTA() == 1){//如果从机状态为1
-        this->mesh.set_SlaveSTA(0);//设置从机状态为0
-        uint16_t slave_data = this->mesh.getSlavedata();//获取从机命令
-        if(slave_data == this->slave_addr){//如果从机数据不为0
-            this->modbus.set_slave(this->slave_addr,slave_data & 0xFF);//设置从机地址
-        }
+    if(this->mymesh.getSlaveSTA() == 1){//如果从机状态为1
+        this->mymesh.set_SlaveSTA(0);//设置从机状态为0
+        uint16_t slave_data = this->mymesh.getSlavedata();//获取从机命令
+        this->slave_cmd = slave_data & 0xFF;//获取从机命令
+        this->modbus.set_slave((uint8_t)(slave_data >> 8),this->slave_cmd);//设置从机地址
     }else
     {
-        this->modbus.set_slave(this->slave_addr,0x03);//设置从机地址
+        // this->modbus.set_slave(this->slave_addr,0x04);//设置从机地址
     }
 }
 
@@ -69,15 +68,15 @@ void APP::modbus_exec()
  * @brief 执行函数
  * @details 包含应用程序的主要逻辑，会被Arduino的loop()函数循环调用
  *          可以在这里实现各种任务，如读取传感器、控制输出、通信等
- * @details 添加了mesh连接检测功能：
+ * @details 添加了mymesh连接检测功能：
  *          - 有连接时：LED慢闪（1秒一次）
  *          - 无连接时：LED快闪（200ms一次）
  */
 void APP::exec() 
 {
-    this->mesh.update();//执行mesh节点
-    // 检查mesh连接状态
-    if(this->mesh.getNodeList().size() > 0){
+    this->mymesh.update();//执行mymesh节点
+    // 检查mymesh连接状态
+    if(this->mymesh.getNodeList().size() > 0){
         // 有连接：1秒一闪（慢闪）
         blinkInterval = 1000; // 1000ms = 1秒
     } else {
@@ -92,17 +91,17 @@ void APP::exec()
         this->last_led_time = sys_cnt;//更新LED时间戳
     }
 
-    // 检查mesh连接状态
-    if((sys_cnt - this->last_mesh_time) > 10){//如果1秒没有收到mesh数据
-        this->received_handle();//处理mesh接收数据
-        this->last_mesh_time = sys_cnt;//更新mesh时间戳
+    // 检查mymesh连接状态
+    if((sys_cnt - this->last_mesh_time) > 50){//如果1秒没有收到mymesh数据
+        this->received_handle();//处理mymesh接收数据
+        this->last_mesh_time = sys_cnt;//更新mymesh时间戳
     }
 
 
-    uint16_t slave_data = this->modbus.parseModbusFrame();//解析modbus帧
+    uint32_t slave_data = this->modbus.parseModbusFrame();//解析modbus帧
     if(slave_data != 0){//如果从机数据不为0
-        this->slave_addr = slave_data >> 8;//获取从机地址
-        this->slave_sta = slave_data & 0xFF;//获取从机状态
+            this->slave_addr = slave_data >> 16 & 0xFF;//获取从机地址
+            this->slave_sta = slave_data >> 8 & 0xFF;//获取从机状态
     }
 }
 

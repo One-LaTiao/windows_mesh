@@ -1,4 +1,4 @@
-#include "mesh.hpp"
+#include "meshnode.hpp"
 
 // Initialize static member
 MeshNode* MeshNode::instance = nullptr;
@@ -50,7 +50,7 @@ void MeshNode::update() {
     mesh.update();
     
     // 定期发送心跳并显示网络状态
-    static unsigned long lastHeartbeat = 0;
+    // static unsigned long lastHeartbeat = 0;
     // if (millis() - lastHeartbeat > 3000) {
     //     lastHeartbeat = millis();
     //     sendHeartbeat();
@@ -140,11 +140,10 @@ uint16_t MeshNode::getSlavedata()
  *                 addr   cmd
  */
 void MeshNode::receivedCallback(uint32_t from, String &msg) {
-    // 1. 先做长度校验，避免字节数不足8个时访问越界（必须加，防止程序崩溃）
-    if (msg.length() < 13) {
-        return;
+    for (int i = 0; i < 13; i++) {
+        Serial.printf("%02X ", (uint8_t)msg[i]); // 打印两位十六进制，补0
     }
-    instance->slave_addr = static_cast<uint8_t>(msg.charAt(6));//addr
+    instance->slave_addr = static_cast<uint8_t>(msg.charAt(3));//addr
     instance->slave_cmd = static_cast<uint8_t>(msg.charAt(8));//cmd
     instance->slave_sta = 1;//收到消息
 }

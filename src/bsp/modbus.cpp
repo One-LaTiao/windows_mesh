@@ -36,7 +36,7 @@ void MODBUS::serialEvent_callback()
 /**
  * @brief 解析Modbus RTU帧实现：仅替换队列操作，Modbus核心逻辑完全不变
  */
-uint16_t MODBUS::parseModbusFrame()
+uint32_t MODBUS::parseModbusFrame()
 {
 #define UART_CMD_HEAD 0x7b
 #define UART_CMD_TAIL 0x7d
@@ -58,7 +58,8 @@ uint16_t MODBUS::parseModbusFrame()
 					uart_pos = 0;
                     this->serial_addr = modbusFrameBuf[6];//获取从机地址
                     this->serial_sta = modbusFrameBuf[7];//获取从机状态
-                    return (uint16_t)this->serial_addr << 8 | (uint16_t)this->serial_sta;
+                    this->serial_cmd = modbusFrameBuf[8];//获取从机命令
+                    return (uint32_t)this->serial_addr << 16 | (uint32_t)this->serial_sta << 8 | (uint32_t)this->serial_cmd;
                     /* 校验通过，处理数据 */
 				}else{uart_pos = 0;}
 			}

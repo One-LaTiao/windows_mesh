@@ -1,8 +1,8 @@
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
- * @file           : mesh.hpp
- * @brief          : Header for mesh.cpp file.
+ * @file           : meshnode.hpp
+ * @brief          : Header for meshnode.cpp file.
  *                   This file contains the common defines of the application.
  ******************************************************************************
  * @attention
@@ -13,8 +13,8 @@
  ******************************************************************************
  */
 /* USER CODE END Header */
-#ifndef MESH_HPP
-#define MESH_HPP
+#ifndef MESHNODE_HPP
+#define MESHNODE_HPP
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
@@ -72,6 +72,14 @@ public:
      * @return 返回发送是否成功
      */
     bool sendBroadcast(String msg);
+    
+    /**
+     * @brief 发送广播消息（带地址和命令参数）
+     * @param addr 设备地址
+     * @param cmd 命令字
+     * @return 返回发送是否成功
+     */
+    bool sendBroadcast(uint8_t addr, uint8_t cmd);
     
     /**
      * @brief 向指定节点发送单播消息
@@ -153,7 +161,7 @@ private:
     String getSignalQuality(int rssi);
 };
 
-#endif // MESH_HPP
+#endif // MESHNODE_HPP
 
 
 

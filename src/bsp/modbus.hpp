@@ -57,7 +57,7 @@ public:
     // 原有构造函数、方法声明 完全保留
     MODBUS();
     void begin();
-    uint16_t parseModbusFrame();
+    uint32_t parseModbusFrame();
     void serialEvent_callback();  // 串口接收事件处理方法（适配SimpleQueue::push）
     void set_slave(uint8_t addr, uint8_t cmd);
     

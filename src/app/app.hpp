@@ -19,7 +19,7 @@
 #include <Arduino.h>
 #include "../bsp/led.hpp"
 #include "../bsp/uart.hpp"
-#include "../bsp/mesh.hpp"
+#include "../bsp/meshnode.hpp"
 #include "../bsp/modbus.hpp"
 
 
@@ -43,11 +43,11 @@ private:
     uint32_t last_mesh_time;
     uint8_t slave_addr;//从机地址
     uint8_t slave_sta;//从机状态
-    uint8_t slave_cmd;//从机命令0:停止，1:正转，2:反转，3:读取状态
+    uint8_t slave_cmd;//从机命令0:空闲，1:正转，2:反转，3:停止，4:读取状态
     LEDDriver led;
     UART uart;
     MODBUS modbus;
-    MeshNode mesh;
+    MeshNode mymesh;
 };
 
 #endif // APP_HPP
