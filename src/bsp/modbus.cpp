@@ -56,7 +56,7 @@ uint32_t MODBUS::parseModbusFrame()
 				crc = calculateXOR(modbusFrameBuf);
 				if(modbusFrameBuf[10] == crc){
 					uart_pos = 0;
-                    this->serial_addr = modbusFrameBuf[6];//获取从机地址
+                    this->serial_addr = modbusFrameBuf[3];//获取从机地址
                     this->serial_sta = modbusFrameBuf[7];//获取从机状态
                     this->serial_cmd = modbusFrameBuf[8];//获取从机命令
                     return (uint32_t)this->serial_addr << 16 | (uint32_t)this->serial_sta << 8 | (uint32_t)this->serial_cmd;

@@ -44,8 +44,7 @@ void APP::received_handle()
     if(this->mymesh.getSlaveSTA() == 1){//如果从机状态为1
         this->mymesh.set_SlaveSTA(0);//设置从机状态为0
         uint16_t slave_data = this->mymesh.getSlavedata();//获取从机命令
-        this->slave_cmd = slave_data & 0xFF;//获取从机命令
-        this->modbus.set_slave((uint8_t)(slave_data >> 8),this->slave_cmd);//设置从机地址
+        // this->modbus.set_slave((uint8_t)(slave_data >> 8),(uint8_t)(slave_data & 0xFF));//设置从机地址
     }else
     {
         // this->modbus.set_slave(this->slave_addr,0x04);//设置从机地址
