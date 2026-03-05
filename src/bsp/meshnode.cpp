@@ -140,9 +140,9 @@ uint16_t MeshNode::getSlavedata()
  *                 addr   cmd
  */
 void MeshNode::receivedCallback(uint32_t from, String &msg) {
-    for (int i = 0; i < 13; i++) {
-        Serial.printf("%02X ", (uint8_t)msg[i]); // 打印两位十六进制，补0
-    }
+    // for (int i = 0; i < 13; i++) {
+    //     Serial.printf("%02X ", (uint8_t)msg[i]); // 打印两位十六进制，补0
+    // }
     instance->slave_addr = static_cast<uint8_t>(msg.charAt(3));//addr
     instance->slave_cmd = static_cast<uint8_t>(msg.charAt(8));//cmd
     instance->slave_sta = 1;//收到消息
